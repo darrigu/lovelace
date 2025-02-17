@@ -47,9 +47,8 @@ begin
    declare
       Request : constant String := "gemini://geminiprotocol.net/" & CR & LF;
 
-      Response     : constant char_array (0 .. 1023) := (others => Interfaces.C.nul);
-      Response_Ptr : chars_ptr;
-      Read         : Integer;
+      Response : char_array_access := new char_array (1 .. 1024);
+      Read     : Integer;
    begin
       if SSL_Write (SSL, New_String (Request), Request'Length) <= 0 then
          Log_Errors;
@@ -57,8 +56,7 @@ begin
       end if;
 
       loop
-         Response_Ptr := New_Char_Array (Response);
-         Read := SSL_Read(SSL, Response_Ptr, Response'Length);
+         Read := SSL_Read(SSL, To_Chars_Ptr (Response), Response'Length);
          exit when Read = 0;
 
          if Read < 0 then
@@ -66,10 +64,8 @@ begin
             raise Exit_Program;
          end if;
 
-         Put (Value (Response_Ptr, size_t (Read)));
+         Put (Value (To_Chars_Ptr (Response), size_t (Read)));
       end loop;
-
-      Free (Response_Ptr);
    end;
 
    raise Exit_Program;
