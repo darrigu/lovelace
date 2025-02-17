@@ -30,12 +30,18 @@ package OpenSSL is
    function SSL_Ctx_New (Meth : access SSL_Method_Type) return access SSL_Ctx_Type;
    pragma Import (C, SSL_Ctx_New, "SSL_CTX_new");
 
+   procedure SSL_Ctx_Free (Ctx : access SSL_Ctx_Type);
+   pragma Import (C, SSL_Ctx_Free, "SSL_CTX_free");
+
    type SSL_Type is null record;
 
    function SSL_New (Ctx : access SSL_Ctx_Type) return access SSL_Type;
    pragma Import (C, SSL_New, "SSL_new");
 
-   procedure SSL_Set_Fd (SSL : access SSL_Type; Fd : Integer);
+   procedure SSL_Free (SSL : access SSL_Type);
+   pragma Import (C, SSL_Free, "SSL_free");
+
+   function SSL_Set_Fd (SSL : access SSL_Type; Fd : Integer) return Integer;
    pragma Import (C, SSL_Set_Fd, "SSL_set_fd");
 
    SSL_Sent_Shutdown     : constant unsigned_long_long := 1;
